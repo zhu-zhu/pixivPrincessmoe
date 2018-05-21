@@ -1,62 +1,70 @@
 <template>
-  <div class="grid">
-    <!--<Card dis-hover v-for="item in mag" :key="item" class="grid-item grid-item&#45;&#45;width2">-->
-      <!--<div style="text-align:center">-->
-        <!--<img style="width: 100%" :src=item>-->
-        <!--<h3>アナスタシア</h3>-->
-      <!--</div>-->
-    <!--</Card>-->
-    <Card dis-hover class="grid-item grid-item--width2">
-      <div style="text-align:center">
-        <img style="width: 100%" src="./1.jpg">
-        <h3>アナスタシア</h3>
+  <div id="main" class="loading">
+    <div class="grid">
+      <div v-for="item in mag" :key="item" class="grid-item grid-item--width2">
+        <img :src=item alt="aa" />
       </div>
-    </Card>
-    <Card dis-hover class="grid-item grid-item--width2">
-      <div style="text-align:center">
-        <img style="width: 100%" src="./1.jpg">
-        <h3>アナスタシア</h3>
-      </div>
-    </Card>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import '../../assets/plugin/wookmark/wookmark'
-export default {
-  name: 'home',
-  data () {
-    return {
-      mag: ''
-    }
-  },
-  methods: {
-    init: async () => {
-    }
-  },
-  mounted () {
-    // this.init()
-    let wookmark = new Wookmark('.grid')
-  },
-  async created () {
-    try {
-      let {data, status} = await axios({
-        method: 'post',
-        url: 'http://localhost:3000/p1'
-      })
-      if (status === 200) {
-        // this.mag = data
+  import axios from 'axios'
+  import '../../assets/plugin/wookmark/wookmark.js'
+  import imagesLoaded from 'imagesloaded'
+  import anime from 'animejs'
+  export default {
+    name: 'home',
+    data () {
+      return {
+        mag: ''
       }
-    } catch (e) {
-      console.log(e);
+    },
+    methods: {
+
+    },
+    mounted () {
+    },
+    async created () {
+      try {
+        let {data, status} = await axios({
+          method: 'post',
+          url: 'http://localhost:3000/p1'
+        })
+        if (status === 200) {
+          this.mag = data
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      this.$nextTick(() => {
+        imagesLoaded( document.querySelector('.grid'), () => {
+          let wookmark = new Wookmark('.grid');
+          document.querySelector('#main').classList.remove('loading')
+          let reverseAnim = anime({
+            targets: '.grid-item',
+            duration: function(t,i) {
+              return 500 + i*50;
+            },
+            easing: 'easeOutExpo',
+            delay: function(t,i) {
+              return i * 20;
+            },
+            opacity: {
+              value: [0,1],
+              duration: function(t,i) {
+                return 250 + i*50;
+              },
+              easing: 'linear'
+            },
+            translateY: [400,0]
+          });
+        })
+      })
+    },
+    components: {
     }
-  },
-  components: {
-  },
-  updated () {
   }
-}
 </script>
 
 <style scoped>
